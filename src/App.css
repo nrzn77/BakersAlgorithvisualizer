@@ -1,0 +1,42 @@
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+.matrix-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+td {
+  border: 1px solid #000;
+  padding: 5px 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+h3 {
+  margin-top: 20px;
+}
+
+#output {
+  margin-left: 40px; 
+}
+
+#output {
+  padding-left: 20px; 
+}
+#output {
+  position: relative;
+  left: 20px; 
+}
