@@ -40,14 +40,16 @@ export const isSafe2 = (allocation, max, available) => {
   const work = [...available];
   const finish = Array(numProcesses).fill(false);
 
-  // Find one safe sequence and count total possible sequences
-  let safeSequence = [];
-  let totalSequences = 0;
+  // Find all possible safe sequences
+  const safeSequences = []; // Store all safe sequences
+  let totalSequences = 0; // Count total safe sequences
 
-  const findSafeSequence = () => {
-    if (safeSequence.length === numProcesses) {
-      totalSequences++;
-      return true; // Stop after finding one sequence
+  const findSafeSequences = (sequence, work, finish) => {
+    if (sequence.length === numProcesses) {
+      // Found a valid safe sequence
+      safeSequences.push([...sequence]); // Add to the list of safe sequences
+      totalSequences++; // Increment the total count
+      return;
     }
 
     for (let i = 0; i < numProcesses; i++) {
@@ -62,44 +64,44 @@ export const isSafe2 = (allocation, max, available) => {
 
         if (canProceed) {
           // Simulate process finishing
+          const newWork = [...work];
           for (let j = 0; j < numResources; j++) {
-            work[j] += allocation[i][j];
+            newWork[j] += allocation[i][j];
           }
           finish[i] = true;
-          safeSequence.push(i);
+          sequence.push(i);
 
-          // Display progress
-          outputDiv.innerHTML += `<p>Process ${i} can proceed</p>`;
-          outputDiv.innerHTML += `<p>Updated Work: ${JSON.stringify(work)}</p>`;
-
-          if (findSafeSequence()) {
-            return true; // Stop after finding one sequence
+          // Display progress (only for the first sequence)
+          if (totalSequences === 0) {
+            outputDiv.innerHTML += `<p>Process ${i} can proceed</p>`;
+            outputDiv.innerHTML += `<p>Updated Work: ${JSON.stringify(newWork)}</p>`;
           }
+
+          // Recur to find more sequences
+          findSafeSequences(sequence, newWork, finish);
 
           // Backtrack
           finish[i] = false;
-          safeSequence.pop();
-          for (let j = 0; j < numResources; j++) {
-            work[j] -= allocation[i][j];
-          }
+          sequence.pop();
         }
       }
     }
-    return false;
   };
 
-  findSafeSequence();
+  findSafeSequences([], work, finish);
 
-  // Display the safe sequence
-  outputDiv.innerHTML += `<h3>Safe Sequence:</h3>`;
-  outputDiv.innerHTML += `<pre>${JSON.stringify(safeSequence)}</pre>`;
+  // Display the safe sequence (only the first one)
+  if (safeSequences.length > 0) {
+    outputDiv.innerHTML += `<h3>Safe Sequence:</h3>`;
+    outputDiv.innerHTML += `<p>${safeSequences[0].join(", ")}</p>`;
+  }
 
   // Display the total number of possible safe sequences
-  outputDiv.innerHTML += `<p>Possible sequences: ${totalSequences}</p>`;
+  outputDiv.innerHTML += `<h3>Total Possible Safe Sequences: ${totalSequences}</h3>`;
 
   return {
-    isSafe: safeSequence.length === numProcesses,
-    safeSequence,
+    isSafe: totalSequences > 0,
+    safeSequence: safeSequences[0] || [], // Return the first safe sequence (if any)
     totalSequences,
   };
 };
